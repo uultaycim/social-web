@@ -1,0 +1,13 @@
+1. P: White screen - S:appwrite/config.ts  
+    export const appwriteConfig = {
+    projectId: '65f159ae4f7e1f95687d',
+    url: 'https://cloud.appwrite.io/v1',
+    databaseId: '65f952cfc20a6d2aeb94',
+    storageId: '65f952922cd4efcf9f64',
+    userCollectionId: '65f953ac86e83ad6db92',
+    postCollectionId: '65f9536319d4f72d4705',
+    savesCollectionId: '65f953d7efc793c5d056'
+
+} - без лишних переменных
+
+2. - 

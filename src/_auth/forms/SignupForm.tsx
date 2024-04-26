@@ -8,10 +8,20 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
 import { useToast } from "@/components/ui/use-toast";
-
+import { Label } from "@/components/ui/label"
 import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queries";
 import { SignupValidation } from "@/lib/validation";
 import { useUserContext } from "@/context/AuthContext";
+import { useState } from "react";
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuRadioGroup,
+  DropdownMenuRadioItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu"
 
 const SignupForm = () => {
   const { toast } = useToast();
@@ -21,10 +31,11 @@ const SignupForm = () => {
   const form = useForm<z.infer<typeof SignupValidation>>({
     resolver: zodResolver(SignupValidation),
     defaultValues: {
-      name: "",
       username: "",
       email: "",
-      password: "",
+      password:"",
+      language: "",
+      accountType: ""
     },
   });
 
@@ -35,6 +46,7 @@ const SignupForm = () => {
   // Handler
   const handleSignup = async (user: z.infer<typeof SignupValidation>) => {
     try {
+      debugger;
       const newUser = await createUserAccount(user);
 
       if (!newUser) {
@@ -89,20 +101,6 @@ const SignupForm = () => {
           className="flex flex-col gap-5 w-full mt-4">
           <FormField
             control={form.control}
-            name="name"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel className="shad-form_label">Name</FormLabel>
-                <FormControl>
-                  <Input type="text" className="shad-input" {...field} />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
             name="username"
             render={({ field }) => (
               <FormItem>
@@ -143,6 +141,65 @@ const SignupForm = () => {
             )}
           />
 
+          <FormField
+            control={form.control}
+            name="accountType"
+            render={({ field }) => (
+             <FormItem>
+              <FormLabel className="shad-form_label">Account Type</FormLabel>
+              <FormControl>
+                  <RadioGroup
+                      onValueChange={field.onChange}
+                      defaultValue={field.value}
+                      className="flex flex-col space-y-1"
+                    >
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="user" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          User
+                        </FormLabel>
+                      </FormItem>
+                      <FormItem className="flex items-center space-x-3 space-y-0">
+                        <FormControl>
+                          <RadioGroupItem value="business" />
+                        </FormControl>
+                        <FormLabel className="font-normal">
+                          Business
+                        </FormLabel>
+                      </FormItem>
+                    </RadioGroup>
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+            )}
+          />
+             <FormField
+            control={form.control}
+            name="language"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <Button >Select account language</Button>
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent className="w-56">
+                      <DropdownMenuSeparator />
+                      <DropdownMenuRadioGroup value={field.value} onValueChange={(value) => field.onChange(value)}>
+                        <DropdownMenuRadioItem value="top">Rus</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="bottom">Eng</DropdownMenuRadioItem>
+                      </DropdownMenuRadioGroup>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+
+          
           <Button type="submit" className="shad-button_primary">
             {isCreatingAccount || isSigningInUser || isUserLoading ? (
               <div className="flex-center gap-2">

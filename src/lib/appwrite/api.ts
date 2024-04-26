@@ -10,25 +10,29 @@ import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 // ============================== SIGN UP
 export async function createUserAccount(user: INewUser) {
   try {
+    debugger;
     const newAccount = await account.create(
       ID.unique(),
       user.email,
       user.password,
-      user.name
+      user.username
     );
-
+    console.log(newAccount, "newAccount")
     if (!newAccount) throw Error;
 
-    const avatarUrl = avatars.getInitials(user.name);
-
+    const avatarUrl = avatars.getInitials(user.username);
+  
+    debugger;
     const newUser = await saveUserToDB({
       accountId: newAccount.$id,
-      name: newAccount.name,
+      username: newAccount.name,//name==username
       email: newAccount.email,
-      username: user.username,
       imageUrl: avatarUrl,
+      language: user.language,
+      accountType: user.accountType,
+      rated: 0
     });
-
+    console.log(newUser,"newUser")
     return newUser;
   } catch (error) {
     console.log(error);
@@ -40,18 +44,22 @@ export async function createUserAccount(user: INewUser) {
 export async function saveUserToDB(user: {
   accountId: string;
   email: string;
-  name: string;
+  username: string;
+  language:string,
+  accountType:string,
+  rated:number,
   imageUrl: URL;
-  username?: string;
 }) {
+  
   try {
+    debugger;
     const newUser = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.userCollectionId,
       ID.unique(),
       user
     );
-
+    console.log(newUser, "createdDoc into db!")
     return newUser;
   } catch (error) {
     console.log(error);
@@ -61,8 +69,9 @@ export async function saveUserToDB(user: {
 // ============================== SIGN IN
 export async function signInAccount(user: { email: string; password: string }) {
   try {
+    debugger;
     const session = await account.createEmailSession(user.email, user.password);
-
+    console.log(session, "session")
     return session;
   } catch (error) {
     console.log(error);
@@ -72,9 +81,12 @@ export async function signInAccount(user: { email: string; password: string }) {
 // ============================== GET ACCOUNT
 export async function getAccount() {
   try {
+    debugger;
     const currentAccount = await account.get();
-
-    return currentAccount;
+    
+    console.log(currentAccount, "currentAccount")
+    return currentAccount; 
+    
   } catch (error) {
     console.log(error);
   }
@@ -83,6 +95,7 @@ export async function getAccount() {
 // ============================== GET USER
 export async function getCurrentUser() {
   try {
+    debugger;
     const currentAccount = await getAccount();
 
     if (!currentAccount) throw Error;
@@ -92,6 +105,7 @@ export async function getCurrentUser() {
       appwriteConfig.userCollectionId,
       [Query.equal("accountId", currentAccount.$id)]
     );
+    console.log(currentUser, "currentUser")
 
     if (!currentUser) throw Error;
 

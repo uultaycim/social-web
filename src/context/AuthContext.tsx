@@ -25,8 +25,8 @@ const INITIAL_STATE = {
 type IContextType = {
   user: IUser;
   isLoading: boolean;
-  setUser: React.Dispatch<React.SetStateAction<IUser>>;
   isAuthenticated: boolean;
+  setUser: React.Dispatch<React.SetStateAction<IUser>>;
   setIsAuthenticated: React.Dispatch<React.SetStateAction<boolean>>;
   checkAuthUser: () => Promise<boolean>;
 };
@@ -53,7 +53,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
           bio: currentAccount.bio,
         });
         setIsAuthenticated(true);
-
+        console.log(user, "user context",)
         return true;
       }
 
@@ -67,7 +67,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    debugger;
     const cookieFallback = localStorage.getItem("cookieFallback");
+    console.log(cookieFallback,"cookieFallback")
     if (
       cookieFallback === "[]" ||
       cookieFallback === null ||
@@ -75,7 +77,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     ) {
       navigate("/sign-in");
     }
-
+    
     checkAuthUser();
   }, []);
 
