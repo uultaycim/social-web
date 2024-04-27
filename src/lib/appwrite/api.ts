@@ -30,7 +30,7 @@ export async function createUserAccount(user: INewUser) {
       imageUrl: avatarUrl,
       language: user.language,
       accountType: user.accountType,
-      rated: 0
+      // rated: 0
     });
     console.log(newUser,"newUser")
     return newUser;
@@ -47,7 +47,7 @@ export async function saveUserToDB(user: {
   username: string;
   language:string,
   accountType:string,
-  rated:number,
+  // rated:number,
   imageUrl: URL;
 }) {
   

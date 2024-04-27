@@ -8,11 +8,9 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Loader from "@/components/shared/Loader";
 import { useToast } from "@/components/ui/use-toast";
-import { Label } from "@/components/ui/label"
 import { useCreateUserAccount, useSignInAccount } from "@/lib/react-query/queries";
 import { SignupValidation } from "@/lib/validation";
 import { useUserContext } from "@/context/AuthContext";
-import { useState } from "react";
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import {
   DropdownMenu,
@@ -188,8 +186,8 @@ const SignupForm = () => {
                     <DropdownMenuContent className="w-56">
                       <DropdownMenuSeparator />
                       <DropdownMenuRadioGroup value={field.value} onValueChange={(value) => field.onChange(value)}>
-                        <DropdownMenuRadioItem value="top">Rus</DropdownMenuRadioItem>
-                        <DropdownMenuRadioItem value="bottom">Eng</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="Russian">Rus</DropdownMenuRadioItem>
+                        <DropdownMenuRadioItem value="English">Eng</DropdownMenuRadioItem>
                       </DropdownMenuRadioGroup>
                     </DropdownMenuContent>
                   </DropdownMenu>
