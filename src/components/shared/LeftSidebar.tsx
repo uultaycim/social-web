@@ -48,13 +48,13 @@ const LeftSidebar = () => {
               className="h-14 w-14 rounded-full"
             />
             <div className="flex flex-col">
-              <p className="body-bold">{user.name}</p>
+              <p className="body-bold">{user.username}</p>
               <p className="small-regular text-light-3">@{user.username}</p>
             </div>
           </Link>
         )}
 
-        <ul className="flex flex-col gap-6">
+        <ul className="flex flex-col gap-1">
           {sidebarLinks.map((link: INavLink) => {
             const isActive = pathname === link.route;
 

@@ -35,7 +35,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
     defaultValues: {
       caption: post ? post?.caption : "",
       file: [],
-      location: post ? post.location : "",
       tags: post ? post.tags.join(",") : "",
     },
   });
@@ -52,6 +51,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
     if (post && action === "Update") {
       const updatedPost = await updatePost({
         ...value,
+        type : post.type,
         postId: post.$id,
         imageId: post.imageId,
         imageUrl: post.imageUrl,
@@ -66,11 +66,12 @@ const PostForm = ({ post, action }: PostFormProps) => {
     }
 
     // ACTION = CREATE
+    console.log("Files:", value.file);
     const newPost = await createPost({
       ...value,
       userId: user.id,
     });
-
+    
     if (!newPost) {
       toast({
         title: `${action} post failed. Please try again.`,
@@ -112,20 +113,6 @@ const PostForm = ({ post, action }: PostFormProps) => {
                   fieldChange={field.onChange}
                   mediaUrl={post?.imageUrl}
                 />
-              </FormControl>
-              <FormMessage className="shad-form_message" />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={form.control}
-          name="location"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel className="shad-form_label">Add Location</FormLabel>
-              <FormControl>
-                <Input type="text" className="shad-input" {...field} />
               </FormControl>
               <FormMessage className="shad-form_message" />
             </FormItem>

@@ -53,14 +53,23 @@ const PostDetails = () => {
         <Loader />
       ) : (
         <div className="post_details-card">
+          {post?.type.startsWith("video") ?
+          (
+          <video
+            src={post?.imageUrl}
+            className="post_details-img"
+            controls
+          />
+          ):(
           <img
             src={post?.imageUrl}
             alt="creator"
             className="post_details-img"
           />
+          )}
 
           <div className="post_details-info">
-            <div className="flex-between w-full">
+            <div className="flex-between wa-full">
               <Link
                 to={`/profile/${post?.creator.$id}`}
                 className="flex items-center gap-3">
@@ -81,9 +90,6 @@ const PostDetails = () => {
                       {multiFormatDateString(post?.$createdAt)}
                     </p>
                     •
-                    <p className="subtle-semibold lg:small-regular">
-                      {post?.location}
-                    </p>
                   </div>
                 </div>
               </Link>

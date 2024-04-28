@@ -6,7 +6,6 @@ import { getCurrentUser } from "@/lib/appwrite/api";
 
 export const INITIAL_USER = {
   id: "",
-  name: "",
   username: "",
   email: "",
   imageUrl: "",
@@ -46,7 +45,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (currentAccount) {
         setUser({
           id: currentAccount.$id,
-          name: currentAccount.name,
           username: currentAccount.username,
           email: currentAccount.email,
           imageUrl: currentAccount.imageUrl,

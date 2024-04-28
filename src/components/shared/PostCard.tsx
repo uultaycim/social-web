@@ -11,8 +11,8 @@ type PostCardProps = {
 
 const PostCard = ({ post }: PostCardProps) => {
   const { user } = useUserContext();
-
-  if (!post.creator) return;
+  console.log(post.imageUrl,"post url")
+  // if (!post.creator) return;
 
   return (
     <div className="post-card">
@@ -28,21 +28,21 @@ const PostCard = ({ post }: PostCardProps) => {
               className="w-12 lg:h-12 rounded-full"
             />
           </Link>
-
+       
           <div className="flex flex-col">
+          <Link to={`/profile/${post.creator.$id}`}>
             <p className="base-medium lg:body-bold text-light-1">
-              {post.creator.name}
+              {post.creator.username}
             </p>
+            </Link>
             <div className="flex-center gap-2 text-light-3">
               <p className="subtle-semibold lg:small-regular ">
                 {multiFormatDateString(post.$createdAt)}
               </p>
               •
-              <p className="subtle-semibold lg:small-regular">
-                {post.location}
-              </p>
             </div>
           </div>
+          
         </div>
 
         <Link
@@ -68,12 +68,21 @@ const PostCard = ({ post }: PostCardProps) => {
             ))}
           </ul>
         </div>
+        {
+        post.type.startsWith("image") ? (
+          <img
+            src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
+            alt="post image"
+            className="post-card_img"
+          />
+        ) : (
+          <video
+            src={post.imageUrl}
+            className="post-card_video"
+            controls
+          />
+        )}
 
-        <img
-          src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
-          alt="post image"
-          className="post-card_img"
-        />
       </Link>
 
       <PostStats post={post} userId={user.id} />

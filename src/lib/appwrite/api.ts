@@ -134,6 +134,8 @@ export async function signOutAccount() {
 // ============================== CREATE POST
 export async function createPost(post: INewPost) {
   try {
+    console.log(post.file[0],"Goes into uploadFile")
+    debugger;
     // Upload file to appwrite storage
     const uploadedFile = await uploadFile(post.file[0]);
 
@@ -148,7 +150,7 @@ export async function createPost(post: INewPost) {
 
     // Convert tags into array
     const tags = post.tags?.replace(/ /g, "").split(",") || [];
-
+    const filetype = post.file[0].type
     // Create post
     const newPost = await databases.createDocument(
       appwriteConfig.databaseId,
@@ -157,9 +159,9 @@ export async function createPost(post: INewPost) {
       {
         creator: post.userId,
         caption: post.caption,
+        type:filetype, 
         imageUrl: fileUrl,
         imageId: uploadedFile.$id,
-        location: post.location,
         tags: tags,
       }
     );
@@ -178,12 +180,13 @@ export async function createPost(post: INewPost) {
 // ============================== UPLOAD FILE
 export async function uploadFile(file: File) {
   try {
+    debugger;
     const uploadedFile = await storage.createFile(
       appwriteConfig.storageId,
       ID.unique(),
       file
     );
-
+   
     return uploadedFile;
   } catch (error) {
     console.log(error);
@@ -193,17 +196,18 @@ export async function uploadFile(file: File) {
 // ============================== GET FILE URL
 export function getFilePreview(fileId: string) {
   try {
-    const fileUrl = storage.getFilePreview(
+    debugger;
+    const fileUrl = storage.getFileView(
       appwriteConfig.storageId,
-      fileId,
-      2000,
-      2000,
-      "top",
-      100
+      fileId
+      // 2000,
+      // 2000,
+      // "top",
+      // 100
     );
-
+    console.log(fileUrl)
     if (!fileUrl) throw Error;
-
+    debugger;
     return fileUrl;
   } catch (error) {
     console.log(error);
@@ -316,7 +320,6 @@ export async function updatePost(post: IUpdatePost) {
         caption: post.caption,
         imageUrl: image.imageUrl,
         imageId: image.imageId,
-        location: post.location,
         tags: tags,
       }
     );
@@ -387,12 +390,14 @@ export async function likePost(postId: string, likesArray: string[]) {
 // ============================== SAVE POST
 export async function savePost(userId: string, postId: string) {
   try {
+    debugger;
+    console.log(userId)
     const updatedPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
       ID.unique(),
       {
-        user: userId,
+        users: userId,
         post: postId,
       }
     );
@@ -443,12 +448,14 @@ export async function getUserPosts(userId?: string) {
 // ============================== GET POPULAR POSTS (BY HIGHEST LIKE COUNT)
 export async function getRecentPosts() {
   try {
+    debugger;
     const posts = await databases.listDocuments(
       appwriteConfig.databaseId,
       appwriteConfig.postCollectionId,
       [Query.orderDesc("$createdAt"), Query.limit(20)]
     );
-
+    console.log(posts, "getRecentPosts")
+    debugger;
     if (!posts) throw Error;
 
     return posts;

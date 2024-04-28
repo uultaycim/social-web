@@ -16,17 +16,29 @@ const GridPostList = ({
   showStats = true,
 }: GridPostListProps) => {
   const { user } = useUserContext();
-
+  debugger;
+ 
+ 
   return (
     <ul className="grid-container">
       {posts.map((post) => (
         <li key={post.$id} className="relative min-w-80 h-80">
           <Link to={`/posts/${post.$id}`} className="grid-post_link">
-            <img
+            
+              {
+              post.type.startsWith("image") ? (
+                <img
               src={post.imageUrl}
               alt="post"
               className="h-full w-full object-cover"
             />
+              ) : (
+                <video
+                  src={post.imageUrl}
+                  className="h-full w-full object-cover"
+                  controls
+                />
+              )}
           </Link>
 
           <div className="grid-post_user">

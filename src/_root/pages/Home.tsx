@@ -3,10 +3,13 @@ import { Models } from "appwrite";
 // import { useToast } from "@/components/ui/use-toast";
 import { Loader, PostCard, UserCard } from "@/components/shared";
 import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
+import { useUserContext } from "@/context/AuthContext";
 
 const Home = () => {
   // const { toast } = useToast();
- 
+  console.log(" in Home.tsx")
+  const { user } = useUserContext();
+  debugger;
   const {
     data: posts,
     isLoading: isPostLoading,
@@ -57,10 +60,12 @@ const Home = () => {
         ) : (
           <ul className="grid 2xl:grid-cols-2 gap-6">
             {creators?.documents.map((creator) => (
-              <li key={creator?.$id}>
-                <UserCard user={creator} />
-              </li>
-            ))}
+                creator?.$id !== user.id && (
+                  <li key={creator?.$id}>
+                    <UserCard user={creator} />
+                  </li>
+                )
+              ))}
           </ul>
         )}
       </div>

@@ -28,7 +28,6 @@ const UpdateProfile = () => {
     resolver: zodResolver(ProfileValidation),
     defaultValues: {
       file: [],
-      name: user.name,
       username: user.username,
       email: user.email,
       bio: user.bio || "",
@@ -66,7 +65,7 @@ const UpdateProfile = () => {
 
     setUser({
       ...user,
-      name: updatedUser?.name,
+      username: updatedUser?.username,
       bio: updatedUser?.bio,
       imageUrl: updatedUser?.imageUrl,
     });
@@ -106,21 +105,7 @@ const UpdateProfile = () => {
                 </FormItem>
               )}
             />
-
-            <FormField
-              control={form.control}
-              name="name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel className="shad-form_label">Name</FormLabel>
-                  <FormControl>
-                    <Input type="text" className="shad-input" {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
+            
             <FormField
               control={form.control}
               name="username"
