@@ -11,9 +11,9 @@ const LeftSidebar = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
   const { user, setUser, setIsAuthenticated, isLoading } = useUserContext();
-
+  const isChatPath = pathname === '/chat';
   const { mutate: signOut } = useSignOutAccount();
-
+  
   const handleSignOut = async (
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>
   ) => {
@@ -25,16 +25,18 @@ const LeftSidebar = () => {
   };
 
   return (
-    <nav className="leftsidebar">
-      <div className="flex flex-col gap-11">
-        <Link to="/" className="flex gap-3 items-center">
-          <img
-            src="/assets/images/logo.svg"
-            alt="logo"
-            width={170}
-            height={36}
-          />
-        </Link>
+    <nav className={`leftsidebar ${isChatPath ? 'chat-mode' : ''}`}>
+      <div className="flex flex-col gap-11"> 
+        {!isChatPath && (
+            <Link to="/" className="flex gap-3 items-center">
+                <img
+                  src="/assets/images/logo.svg"
+                  alt="logo"
+                  width={170}
+                  height={36}
+                />
+              </Link>
+        )}
 
         {isLoading || !user.email ? (
           <div className="h-14">
@@ -48,8 +50,9 @@ const LeftSidebar = () => {
               className="h-14 w-14 rounded-full"
             />
             <div className="flex flex-col">
-              <p className="body-bold">{user.username}</p>
-              <p className="small-regular text-light-3">@{user.username}</p>
+            {!isChatPath && (
+             <><p className="body-bold">{user.username}</p><p className="small-regular text-light-3">@{user.username}</p></>
+            )}
             </div>
           </Link>
         )}
@@ -74,7 +77,11 @@ const LeftSidebar = () => {
                       isActive && "invert-white"
                     }`}
                   />
-                  {link.label}
+                  {!isChatPath && (
+                    <span>{link.label}</span>
+                  )}
+
+                 
                 </NavLink>
               </li>
             );
@@ -87,7 +94,10 @@ const LeftSidebar = () => {
         className="shad-button_ghost"
         onClick={(e) => handleSignOut(e)}>
         <img src="/assets/icons/logout.svg" alt="logout" />
-        <p className="small-medium lg:base-medium">Logout</p>
+        {!isChatPath && (
+           <p className="small-medium lg:base-medium">Logout</p>
+        )}
+        
       </Button>
     </nav>
   );

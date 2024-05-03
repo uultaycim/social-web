@@ -221,7 +221,9 @@
   .leftsidebar {
     @apply hidden md:flex px-6 py-10 flex-col justify-between min-w-[270px] bg-dark-2;
   }
-
+  .leftsidebar.chat-mode {
+    min-width: 20px; /* Измененная ширина для режима чата */
+  }
   .leftsidebar-link {
     @apply rounded-lg base-medium hover:bg-primary-500 transition;
   }
