@@ -19,7 +19,7 @@ import SigninForm from "@/_auth/forms/SigninForm";
 import { Toaster } from "@/components/ui/toaster";
 
 import "./globals.css";
-import СhatApp from "./chat/СhatApp";
+// import СhatApp from "./chat/СhatApp";
 
 const App = () => {
   return (
@@ -34,7 +34,7 @@ const App = () => {
         {/* private routes */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
-          <Route path="/chat" element={<СhatApp />} />
+          {/* <Route path="/chat" element={<СhatApp />} /> */}
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/all-users" element={<AllUsers />} />

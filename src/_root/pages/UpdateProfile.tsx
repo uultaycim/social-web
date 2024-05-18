@@ -56,7 +56,7 @@ const UpdateProfile = () => {
       imageUrl: currentUser.imageUrl,
       imageId: currentUser.imageId,
     });
-
+    console.log(updatedUser)
     if (!updatedUser) {
       toast({
         title: `Update user failed. Please try again.`,

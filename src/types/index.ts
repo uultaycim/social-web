@@ -36,6 +36,8 @@ export type IUser = {
   email: string;
   imageUrl: string;
   bio: string;
+  followers?:number;
+  following?:number;
 };
 
 export type INewUser = {
@@ -45,3 +47,15 @@ export type INewUser = {
   language: string;
   accountType: string;
 };
+export type IMessage={
+  senderId:string;
+  recieverId:string;
+  message:string;
+  timestamp: string;
+};
+export type IConversation={
+  participants: string;
+  messages:string;
+  timestamp:string;
+}
+

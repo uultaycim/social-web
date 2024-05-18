@@ -15,7 +15,9 @@ export const appwriteConfig = {
     storageId: '65f952922cd4efcf9f64',
     userCollectionId: '65f953ac86e83ad6db92',
     postCollectionId: '65f9536319d4f72d4705',
-    savesCollectionId: '65f953d7efc793c5d056'
+    savesCollectionId: '65f953d7efc793c5d056',
+    messagesCollection:'66364a610036c1d8a7f8',
+    conversationCollection:'66364c8400237b4d40ac'
 
 }
 // PORT=3000

@@ -1,8 +1,100 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser, IMessage, IUser } from "@/types";
+// import User from "@/chat/models/user.model";
 
+
+export async function FollowChanger(user:IUser,currentUser:IUser){
+  debugger;
+  try {
+    let followers = currentUser.followers ? currentUser.followers + 1 : 1; // Increment followers count by 1
+    let following = user.following ? user.following + 1 : 1; 
+    const user_with_new_followers  = await databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.userCollectionId,
+    currentUser.id,
+    {
+       username:currentUser.username,
+       email:currentUser.email,
+       imageUrl:currentUser.imageUrl,
+       followers:followers
+    }
+    )
+    const me_with_new_following  = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      user.id,
+      {
+         username:user.username,
+         email:user.email,
+         imageUrl:user.imageUrl,
+         followers:following
+      }
+      )
+      console.log(me_with_new_following, user_with_new_followers)
+      return null
+  } catch (error) {
+    return error
+  }
+}
+
+export async function unFollowChanger(user:IUser,currentUser:IUser){
+  debugger;
+  try {
+    let followers = currentUser.followers ? currentUser.followers - 1 : 1; // Increment followers count by 1
+    let following = user.following ? user.following - 1 : 1; 
+    const user_with_new_followers  = await databases.updateDocument(
+    appwriteConfig.databaseId,
+    appwriteConfig.userCollectionId,
+    currentUser.id,
+    {
+       username:currentUser.username,
+       email:currentUser.email,
+       imageUrl:currentUser.imageUrl,
+       followers:followers
+    }
+    )
+    const me_with_new_following  = await databases.updateDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      user.id,
+      {
+         username:user.username,
+         email:user.email,
+         imageUrl:user.imageUrl,
+         followers:following
+      }
+      )
+      console.log(me_with_new_following, user_with_new_followers)
+      return null
+  } catch (error) {
+    return error
+  }
+}
+
+
+
+//=============================================================
+//CHAT
+//=============================================================
+export async function createMessage(message:IMessage){
+    try {
+      const newMessage = await databases.createDocument(
+        appwriteConfig.databaseId,
+        appwriteConfig.messagesCollection,
+        ID.unique(),
+        message
+      ) 
+      console.log(newMessage)
+      debugger;
+     
+      return newMessage
+
+    } catch (error) {
+      
+    }
+}
 // ============================================================
 // AUTH
 // ============================================================
@@ -30,6 +122,8 @@ export async function createUserAccount(user: INewUser) {
       imageUrl: avatarUrl,
       language: user.language,
       accountType: user.accountType,
+      followers: 0,
+      following:0
       // rated: 0
     });
     console.log(newUser,"newUser")
@@ -49,6 +143,8 @@ export async function saveUserToDB(user: {
   accountType:string,
   // rated:number,
   imageUrl: URL;
+  followers: number;
+  following:number
 }) {
   
   try {
@@ -510,6 +606,7 @@ export async function getUserById(userId: string) {
 
 // ============================== UPDATE USER
 export async function updateUser(user: IUpdateUser) {
+  console.log("api updatrUser")
   const hasFileToUpdate = user.file.length > 0;
   try {
     let image = {

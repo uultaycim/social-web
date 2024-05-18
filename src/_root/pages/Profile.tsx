@@ -1,18 +1,11 @@
-import {
-  Route,
-  Routes,
-  Link,
-  Outlet,
-  useParams,
-  useLocation,
-} from "react-router-dom";
-
+import React, { useState } from "react";
+import { Route, Routes, Link, Outlet, useParams, useLocation } from "react-router-dom";
 import { Button } from "@/components/ui";
 import { LikedPosts } from "@/_root/pages";
 import { useUserContext } from "@/context/AuthContext";
-import { useGetUserById } from "@/lib/react-query/queries";
+import { useFollowChanger, useGetUserById, useunFollowChanger } from "@/lib/react-query/queries";
 import { GridPostList, Loader } from "@/components/shared";
-
+import { Currency } from "lucide-react";
 interface StabBlockProps {
   value: string | number;
   label: string;

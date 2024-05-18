@@ -1,13 +1,16 @@
 import { Models } from "appwrite";
-
 // import { useToast } from "@/components/ui/use-toast";
 import { Loader, PostCard, UserCard } from "@/components/shared";
 import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
+// import connectToMongoDB from "@/chat/chatback/connectToMongoDB";
+// import { getUserfromAppwrite } from "@/chat/chatback/api";
 
 const Home = () => {
   // const { toast } = useToast();
   console.log(" in Home.tsx")
+  // getUserfromAppwrite()
+  // connectToMongoDB()
   const { user } = useUserContext();
   debugger;
   const {

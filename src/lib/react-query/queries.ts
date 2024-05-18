@@ -25,12 +25,32 @@ import {
   searchPosts,
   savePost,
   deleteSavedPost,
+  createMessage,
+  FollowChanger,
+  unFollowChanger,
 } from "@/lib/appwrite/api";
-import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
+import { IMessage, INewPost, INewUser, IUpdatePost, IUpdateUser, IUser } from "@/types";
 
 // ============================================================
 // AUTH QUERIES
 // ============================================================
+
+
+// export const useCreateMessage = () => {
+//   return useMutation({
+//     mutationFn: (message: IMessage) => createMessage(message),
+//   });
+// };
+export const useFollowChanger =()=>{
+  return useMutation({
+    mutationFn: ({ user, currentUser}: {user:IUser,currentUser:IUser}) => FollowChanger(user, currentUser),
+  });
+}
+export const useunFollowChanger =()=>{
+  return useMutation({
+    mutationFn: ({ user, currentUser}: {user:IUser,currentUser:IUser}) => unFollowChanger(user, currentUser),
+  });
+}
 
 export const useCreateUserAccount = () => {
   return useMutation({
@@ -231,6 +251,7 @@ export const useGetUserById = (userId: string) => {
 };
 
 export const useUpdateUser = () => {
+  console.log("UpdateUser")
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (user: IUpdateUser) => updateUser(user),
