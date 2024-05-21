@@ -17,9 +17,9 @@ import RootLayout from "./_root/RootLayout";
 import SignupForm from "@/_auth/forms/SignupForm";
 import SigninForm from "@/_auth/forms/SigninForm";
 import { Toaster } from "@/components/ui/toaster";
-
 import "./globals.css";
-// import СhatApp from "./chat/СhatApp";
+import ChatApp from "./chat/chatApp";
+
 
 const App = () => {
   return (
@@ -34,7 +34,8 @@ const App = () => {
         {/* private routes */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
-          {/* <Route path="/chat" element={<СhatApp />} /> */}
+          {/* <Route path="/chat" element={<chatApp/>} /> */}
+          <Route path="/chat" element={<ChatApp/>} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/all-users" element={<AllUsers />} />

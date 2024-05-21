@@ -4,80 +4,39 @@ import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser, IMessage, IUser } from "@/types";
 // import User from "@/chat/models/user.model";
 
-
-export async function FollowChanger(user:IUser,currentUser:IUser){
-  debugger;
-  try {
-    let followers = currentUser.followers ? currentUser.followers + 1 : 1; // Increment followers count by 1
-    let following = user.following ? user.following + 1 : 1; 
-    const user_with_new_followers  = await databases.updateDocument(
-    appwriteConfig.databaseId,
-    appwriteConfig.userCollectionId,
-    currentUser.id,
-    {
-       username:currentUser.username,
-       email:currentUser.email,
-       imageUrl:currentUser.imageUrl,
-       followers:followers
-    }
-    )
-    const me_with_new_following  = await databases.updateDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId,
-      user.id,
-      {
-         username:user.username,
-         email:user.email,
-         imageUrl:user.imageUrl,
-         followers:following
-      }
-      )
-      console.log(me_with_new_following, user_with_new_followers)
-      return null
-  } catch (error) {
-    return error
-  }
-}
-
-export async function unFollowChanger(user:IUser,currentUser:IUser){
-  debugger;
-  try {
-    let followers = currentUser.followers ? currentUser.followers - 1 : 1; // Increment followers count by 1
-    let following = user.following ? user.following - 1 : 1; 
-    const user_with_new_followers  = await databases.updateDocument(
-    appwriteConfig.databaseId,
-    appwriteConfig.userCollectionId,
-    currentUser.id,
-    {
-       username:currentUser.username,
-       email:currentUser.email,
-       imageUrl:currentUser.imageUrl,
-       followers:followers
-    }
-    )
-    const me_with_new_following  = await databases.updateDocument(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId,
-      user.id,
-      {
-         username:user.username,
-         email:user.email,
-         imageUrl:user.imageUrl,
-         followers:following
-      }
-      )
-      console.log(me_with_new_following, user_with_new_followers)
-      return null
-  } catch (error) {
-    return error
-  }
-}
-
-
-
 //=============================================================
 //CHAT
 //=============================================================
+
+
+export async function getUsersForSidebar() {
+  try {
+    const currentUser = await getCurrentUser();
+    if (!currentUser) {
+      throw new Error("Current user not found");
+    }
+    const loggedInUserId = currentUser.$id;
+
+    const filteredUsers = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.userCollectionId,
+      [
+        Query.notEqual("$id", loggedInUserId), // Исключаем текущего пользователя
+      ]
+    );
+
+    return filteredUsers.documents.map((doc) => ({
+      $id: doc.$id,
+      username: doc.username,
+      // other user fields if necessary
+    }));
+  } catch (error) {
+    console.error("Error in getUsersForSidebar: ", error);
+    throw error;
+  }
+}
+
+
 export async function createMessage(message:IMessage){
     try {
       const newMessage = await databases.createDocument(

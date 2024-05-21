@@ -47,15 +47,16 @@ export type INewUser = {
   language: string;
   accountType: string;
 };
-export type IMessage={
-  senderId:string;
-  recieverId:string;
-  message:string;
+export type IMessage = {
+  senderId: string;
+  receiverId: string;
+  message: string;
   timestamp: string;
 };
-export type IConversation={
-  participants: string;
-  messages:string;
-  timestamp:string;
-}
 
+export type IConversation = {
+  id:string;
+  participants: string[];
+  timestamp: string;
+  messages: IMessage[];
+};
