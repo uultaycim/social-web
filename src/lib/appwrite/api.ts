@@ -1,59 +1,119 @@
 import { ID, Query } from "appwrite";
 
 import { appwriteConfig, account, databases, storage, avatars } from "./config";
-import { IUpdatePost, INewPost, INewUser, IUpdateUser, IMessage, IUser } from "@/types";
+import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 // import User from "@/chat/models/user.model";
 
-//=============================================================
-//CHAT
-//=============================================================
-
-
-export async function getUsersForSidebar() {
+// ============================== FOLLOW / UNFOLLOW USER
+export async function followUser(currentUserId: string, targetUserId: string) {
   try {
-    const currentUser = await getCurrentUser();
+    // Получить текущего пользователя
+    const currentUser = await getUserById(currentUserId);
+    console.log("currentuser me following", currentUser)
     if (!currentUser) {
-      throw new Error("Current user not found");
+      throw new Error(`User with ID ${currentUserId} not found`);
     }
-    const loggedInUserId = currentUser.$id;
 
-    const filteredUsers = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.userCollectionId,
-      [
-        Query.notEqual("$id", loggedInUserId), // Исключаем текущего пользователя
-      ]
-    );
+    // Получить целевого пользователя
+    const targetUser = await getUserById(targetUserId);
+    console.log("targetUser to follow", targetUser)
+    if (!targetUser) {
+      throw new Error(`User with ID ${targetUserId} not found`);
+    }
 
-    return filteredUsers.documents.map((doc) => ({
-      $id: doc.$id,
-      username: doc.username,
-      // other user fields if necessary
-    }));
+    // Обновить подписки текущего пользователя
+    const updatedFollowing = Array.isArray(currentUser.following) ? [...currentUser.following, targetUserId] : [targetUserId];
+    console.log('Updated following list:', updatedFollowing); // Отладочная информация
+
+    await updateUser({
+      userId: currentUser.$id,
+      username: currentUser.name,
+      bio: currentUser.bio,
+      imageId: currentUser.imageId,
+      imageUrl: currentUser.imageUrl,
+      file: currentUser.file,
+      following: updatedFollowing,
+    });
+
+    // Обновить подписчиков целевого пользователя
+    const updatedFollowers = Array.isArray(targetUser.followers) ? [...targetUser.followers, currentUserId] : [currentUserId];
+    console.log('Updated followers list:', updatedFollowers); // Отладочная информация
+
+    await updateUser({
+      userId: targetUser.$id,
+      username: targetUser.name,
+      bio: targetUser.bio,
+      imageId: targetUser.imageId,
+      imageUrl: targetUser.imageUrl,
+      file: targetUser.file,
+      followers: updatedFollowers,
+    });
+
+    return { status: "Ok" };
   } catch (error) {
-    console.error("Error in getUsersForSidebar: ", error);
-    throw error;
+    console.error('Error in followUser:', error);
+    return { status: "Error", message: error };
   }
 }
 
 
-export async function createMessage(message:IMessage){
-    try {
-      const newMessage = await databases.createDocument(
-        appwriteConfig.databaseId,
-        appwriteConfig.messagesCollection,
-        ID.unique(),
-        message
-      ) 
-      console.log(newMessage)
-      debugger;
-     
-      return newMessage
-
-    } catch (error) {
-      
+export async function unfollowUser(currentUserId: string, targetUserId: string) {
+  try {
+    // Получаем текущего пользователя
+    const currentUser = await getUserById(currentUserId);
+    if (!currentUser) {
+      throw new Error(`User with ID ${currentUserId} not found`);
     }
+
+    // Получаем целевого пользователя
+    const targetUser = await getUserById(targetUserId);
+    if (!targetUser) {
+      throw new Error(`User with ID ${targetUserId} not found`);
+    }
+
+    // Проверяем существование и тип поля following у текущего пользователя
+    if (!Array.isArray(currentUser.following)) {
+      throw new Error("Invalid following data for current user");
+    }
+
+    // Проверяем существование и тип поля followers у целевого пользователя
+    if (!Array.isArray(targetUser.followers)) {
+      throw new Error("Invalid followers data for target user");
+    }
+
+    // Обновляем список подписок текущего пользователя
+    const updatedFollowing = currentUser.following.filter(id => id !== targetUserId);
+    console.log('Updated following list:', updatedFollowing); // Отладочная информация
+
+    await updateUser({
+      userId: currentUser.$id,
+      username: currentUser.name,
+      bio: currentUser.bio,
+      imageId: currentUser.imageId,
+      imageUrl: currentUser.imageUrl,
+      file: currentUser.file,
+      following: updatedFollowing,
+    });
+
+    // Обновляем список подписчиков целевого пользователя
+    const updatedFollowers = targetUser.followers.filter(id => id !== currentUserId);
+    await updateUser({
+      userId: targetUser.$id,
+      username: targetUser.name,
+      bio: targetUser.bio,
+      imageId: targetUser.imageId,
+      imageUrl: targetUser.imageUrl,
+      file: targetUser.file,
+      followers: updatedFollowers,
+    });
+
+    return { status: "Ok" };
+  } catch (error) {
+    console.error("Error in unfollowUser:", error);
+    throw error;
+  }
 }
+
 // ============================================================
 // AUTH
 // ============================================================
@@ -565,8 +625,8 @@ export async function getUserById(userId: string) {
 
 // ============================== UPDATE USER
 export async function updateUser(user: IUpdateUser) {
-  console.log("api updatrUser")
-  const hasFileToUpdate = user.file.length > 0;
+  console.log("updateUser in api.ts, user", user.userId)
+  const hasFileToUpdate = user.file
   try {
     let image = {
       imageUrl: user.imageUrl,
@@ -586,6 +646,7 @@ export async function updateUser(user: IUpdateUser) {
       }
 
       image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
+      console.log("image", image)
     }
 
     //  Update user
@@ -594,10 +655,11 @@ export async function updateUser(user: IUpdateUser) {
       appwriteConfig.userCollectionId,
       user.userId,
       {
-        name: user.name,
+        username: user.username,
         bio: user.bio,
         imageUrl: image.imageUrl,
-        imageId: image.imageId,
+        followers:user.followers,
+        following:user.following
       }
     );
 

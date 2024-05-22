@@ -48,15 +48,16 @@ const UpdateProfile = () => {
 
   // Handler
   const handleUpdate = async (value: z.infer<typeof ProfileValidation>) => {
+    console.log("handleupdateuser")
     const updatedUser = await updateUser({
       userId: currentUser.$id,
-      name: value.name,
+      username: value.username,
       bio: value.bio,
       file: value.file,
       imageUrl: currentUser.imageUrl,
       imageId: currentUser.imageId,
     });
-    console.log(updatedUser)
+
     if (!updatedUser) {
       toast({
         title: `Update user failed. Please try again.`,
@@ -65,7 +66,6 @@ const UpdateProfile = () => {
 
     setUser({
       ...user,
-      username: updatedUser?.username,
       bio: updatedUser?.bio,
       imageUrl: updatedUser?.imageUrl,
     });
@@ -105,7 +105,7 @@ const UpdateProfile = () => {
                 </FormItem>
               )}
             />
-            
+
             <FormField
               control={form.control}
               name="username"

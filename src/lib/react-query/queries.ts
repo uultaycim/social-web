@@ -25,18 +25,39 @@ import {
   searchPosts,
   savePost,
   deleteSavedPost,
-  getUsersForSidebar,
+  followUser,
+  unfollowUser,
+
 
 } from "@/lib/appwrite/api";
-import { IMessage, INewPost, INewUser, IUpdatePost, IUpdateUser, IUser } from "@/types";
+import { INewPost, INewUser, IUpdatePost, IUpdateUser, IUser } from "@/types";
 
 // ============================================================
 // AUTH QUERIES
 // ============================================================
-export const useGetUsersForSidebar = () => {
-  return useQuery({
-    queryKey: [QUERY_KEYS.GET_USERS_FOR_SIDEBAR],
-    queryFn: getUsersForSidebar,
+export const useFollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ currentUserId, targetUserId }: { currentUserId: string, targetUserId: string }) =>
+      followUser(currentUserId, targetUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
+      });
+    },
+  });
+};
+
+export const useUnfollowUser = () => {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({ currentUserId, targetUserId }: { currentUserId: string, targetUserId: string }) =>
+      unfollowUser(currentUserId, targetUserId),
+    onSuccess: () => {
+      queryClient.invalidateQueries({
+        queryKey: [QUERY_KEYS.GET_USER_BY_ID],
+      });
+    },
   });
 };
 
@@ -240,7 +261,7 @@ export const useGetUserById = (userId: string) => {
 };
 
 export const useUpdateUser = () => {
-  console.log("UpdateUser")
+  console.log("useUpdateUser")
   const queryClient = useQueryClient();
   return useMutation({
     mutationFn: (user: IUpdateUser) => updateUser(user),

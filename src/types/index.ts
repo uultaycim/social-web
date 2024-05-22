@@ -4,15 +4,6 @@ export type INavLink = {
   label: string;
 };
 
-export type IUpdateUser = {
-  userId: string;
-  name: string;
-  bio: string;
-  imageId: string;
-  imageUrl: URL | string;
-  file: File[];
-};
-
 export type INewPost = {
   userId: string;
   caption: string;
@@ -30,14 +21,25 @@ export type IUpdatePost = {
   tags?: string;
 };
 
+export type IUpdateUser = {
+  userId: string;
+  username: string;
+  bio: string;
+  imageId: string;
+  imageUrl: URL | string;
+  file: File[];
+  following?: string[];  // Optional property
+  followers?: string[];  // Optional property
+};
+
 export type IUser = {
   id: string;
   username: string;
   email: string;
   imageUrl: string;
   bio: string;
-  followers?:number;
-  following?:number;
+  followers?:string[];
+  following?:string[];
 };
 
 export type INewUser = {
