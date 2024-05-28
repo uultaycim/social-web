@@ -1,4 +1,5 @@
-import {Adapter, StreamingAdapterObserver} from '@nlux/react';
+import { Adapter, StreamingAdapterObserver } from '@nlux/react';
+import { relation } from './relation';
 
 // A demo API by nlux that connects to OpenAI
 // and returns a stream of Server-Sent events
@@ -7,6 +8,9 @@ const demoProxyServerUrl = 'https://demo.api.nlux.ai/openai/chat/stream';
 export const streamAdapter: Adapter = {
   streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
     const body = { prompt };
+    const Related = relation(prompt)
+    console.log(prompt)
+    console.log(Related)
     const response = await fetch(demoProxyServerUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -14,16 +18,13 @@ export const streamAdapter: Adapter = {
     });
 
     if (response.status !== 200) {
-      observer.error(new Error('Failed to connect to the server'));
-      return;
+      throw new Error('Failed to connect to the server');
     }
 
     if (!response.body) {
       return;
     }
 
-    // Read a stream of server-sent events
-    // and feed them to the observer as they are being generated
     const reader = response.body.getReader();
     const textDecoder = new TextDecoder();
     let doneReading = false;
@@ -37,7 +38,18 @@ export const streamAdapter: Adapter = {
 
       const content = textDecoder.decode(value);
       if (content) {
-        observer.next(content);
+      
+          observer.next(content);
+        
+      }
+      else{
+        observer.next("Вы можете задать вопрос в формате: \
+        Что можно приготовить из [ваши продукты]? \
+        Дай мне рецепт [желаемое блюдо] \
+        У меня [ваше заболевание] составь план питания \
+        Диета для [ваш_случай] \
+        Составь план питания для [ваш_случай] \
+        Расскажи о продукте [продукт]");
       }
     }
 

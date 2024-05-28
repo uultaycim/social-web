@@ -1,4 +1,5 @@
 .custom-ai-chat-comp.nluxc-root.nluxc-theme-nova {
+    --nluxc-text-color: rgb(6, 2, 26);
     --nluxc-button-background-color: #1f6adb;
     --nluxc-button-border-color: #1f6adb;
 
@@ -23,3 +24,6 @@
     --nluxc-border-radius-m: 0;
     --nluxc-border-radius-l: 0;
 }
+.ai-chat-persona-tagline {
+    white-space: pre-wrap;
+  }

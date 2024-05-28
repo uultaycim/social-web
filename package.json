@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@google-cloud/language": "^6.4.0",
     "@hookform/resolvers": "^3.3.1",
     "@nlux/langchain-react": "^1.0.15",
     "@nlux/react": "^1.0.15",
@@ -31,6 +32,7 @@
     "eslint-config-prettier": "^9.0.0",
     "eslint-config-standard": "^17.1.0",
     "eslint-plugin-tailwindcss": "^3.13.0",
+    "fasttext": "^1.0.0",
     "lucide-react": "^0.279.0",
     "mongoose": "^8.1.1",
     "next": "^14.2.3",

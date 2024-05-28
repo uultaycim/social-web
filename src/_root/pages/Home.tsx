@@ -1,23 +1,17 @@
 import { Models } from "appwrite";
-// import { useToast } from "@/components/ui/use-toast";
 import { Loader, PostCard, UserCard } from "@/components/shared";
 import { useGetRecentPosts, useGetUsers } from "@/lib/react-query/queries";
 import { useUserContext } from "@/context/AuthContext";
-// import connectToMongoDB from "@/chat/chatback/connectToMongoDB";
-// import { getUserfromAppwrite } from "@/chat/chatback/api";
 
 const Home = () => {
-  // const { toast } = useToast();
-  console.log(" in Home.tsx")
-  // getUserfromAppwrite()
-  // connectToMongoDB()
   const { user } = useUserContext();
-  debugger;
+
   const {
     data: posts,
     isLoading: isPostLoading,
     isError: isErrorPosts,
   } = useGetRecentPosts();
+
   const {
     data: creators,
     isLoading: isUserLoading,
@@ -37,6 +31,11 @@ const Home = () => {
     );
   }
 
+  // Фильтруем посты, чтобы отображать только те, на создателей которых подписан пользователь
+  const filteredPosts = posts?.documents.filter(post => 
+    Array.isArray(post.creator.followers) && post.creator.followers.includes(user.id)
+  );
+
   return (
     <div className="flex flex-1">
       <div className="home-container">
@@ -46,11 +45,15 @@ const Home = () => {
             <Loader />
           ) : (
             <ul className="flex flex-col flex-1 gap-9 w-full ">
-              {posts?.documents.map((post: Models.Document) => (
-                <li key={post.$id} className="flex justify-center w-full">
-                  <PostCard post={post} />
-                </li>
-              ))}
+              {filteredPosts.length === 0 ? (
+                <p className="body-medium text-light-1">No posts to show</p>
+              ) : (
+                filteredPosts.map((post: Models.Document) => (
+                  <li key={post.$id} className="flex justify-center w-full">
+                    <PostCard post={post} />
+                  </li>
+                ))
+              )}
             </ul>
           )}
         </div>
@@ -63,12 +66,12 @@ const Home = () => {
         ) : (
           <ul className="grid 2xl:grid-cols-2 gap-6">
             {creators?.documents.map((creator) => (
-                creator?.$id !== user.id && (
-                  <li key={creator?.$id}>
-                    <UserCard user={creator} />
-                  </li>
-                )
-              ))}
+              creator?.$id !== user.id && (
+                <li key={creator?.$id}>
+                  <UserCard user={creator} />
+                </li>
+              )
+            ))}
           </ul>
         )}
       </div>

@@ -49,7 +49,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     const isCaptionFoodRelated = isFoodRelated(value.caption);
     const isTagsFoodRelated = isFoodRelated(value.tags);
-    if(!isCaptionFoodRelated||!isTagsFoodRelated){
+    if(!isCaptionFoodRelated && !isTagsFoodRelated){
       toast({
         title: `${action} post failed. Your post is not related to "food" topic.`,
       });

@@ -12,7 +12,272 @@
 
 
 2. - вывод подписок не подписок
-фильтрация по списку relation
-2.2 - выравнивание контента
+фильтрация по тегам, поиск пользователей
 3. - рейтинг
 5. - ограничение бота 
+dDBbtO2inWPSaCbOCRX8KzyMdcP5caQB
+
+const azureTextAnalyticsEndpoint = 'https://<your-endpoint>.cognitiveservices.azure.com/text/analytics/v3.0/keyPhrases';
+const azureApiKey = '<your-api-key>';
+
+const isQuestionAllowed = async (question) => {
+  const body = JSON.stringify({
+    documents: [{ id: '1', language: 'en', text: question }]
+  });
+
+  const response = await fetch(azureTextAnalyticsEndpoint, {
+    method: 'POST',
+    headers: {
+      'Ocp-Apim-Subscription-Key': azureApiKey,
+      'Content-Type': 'application/json'
+    },
+    body
+  });
+
+  if (response.status !== 200) {
+    throw new Error('Failed to connect to Azure Text Analytics');
+  }
+
+  const result = await response.json();
+  const keyPhrases = result.documents[0].keyPhrases;
+  const allowedTopics = ['food', 'recipe', 'diet', 'illness', 'company', 'brand', 'nutrition', 'calories', 'ingredients', 'cooking', 'health'];
+
+  return keyPhrases.some(phrase => allowedTopics.includes(phrase.toLowerCase()));
+};
+
+
+
+export const streamAdapter: Adapter = {
+  streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
+    try {
+      const isAllowed = await isQuestionAllowed(prompt);
+      if (!isAllowed) {
+        observer.error(new Error('Your question must be about food, recipes, diets for illnesses, or food companies.'));
+        return;
+      }
+    } catch (error) {
+      observer.error(new Error('Failed to analyze the question.'));
+      return;
+    }
+
+    const body = { prompt };
+    const response = await fetch(demoProxyServerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.status !== 200) {
+      observer.error(new Error('Failed to connect to the server'));
+      return;
+    }
+
+    if (!response.body) {
+      return;
+    }
+
+    const reader = response.body.getReader();
+    const textDecoder = new TextDecoder();
+    let doneReading = false;
+
+    while (!doneReading) {
+      const { value, done } = await reader.read();
+      if (done) {
+        doneReading = true;
+        continue;
+      }
+
+      const content = textDecoder.decode(value);
+      if (content) {
+        observer.next(content);
+      }
+    }
+
+    observer.complete();
+  }
+};
+const isQuestionAllowed = (question) => {
+  // Regular expression to match questions related to allowed topics
+  const allowedTopicsRegex = /(?:food|recipe|diet|illness|company|brand|nutrition|calories|ingredients|cooking|health)/i;
+  
+  return allowedTopicsRegex.test(question);
+};
+
+
+
+export const streamAdapter: Adapter = {
+  streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
+    // Check if the question is allowed
+    if (!isQuestionAllowed(prompt)) {
+      observer.error(new Error('Your question must be about food, recipes, diets for illnesses, or food companies.'));
+      return;
+    }
+
+    const body = { prompt };
+    const response = await fetch(demoProxyServerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.status !== 200) {
+      observer.error(new Error('Failed to connect to the server'));
+      return;
+    }
+
+    if (!response.body) {
+      return;
+    }
+
+    // Read a stream of server-sent events
+    // and feed them to the observer as they are being generated
+    const reader = response.body.getReader();
+    const textDecoder = new TextDecoder();
+    let doneReading = false;
+
+    while (!doneReading) {
+      const { value, done } = await reader.read();
+      if (done) {
+        doneReading = true;
+        continue;
+      }
+
+      const content = textDecoder.decode(value);
+      if (content) {
+        observer.next(content);
+      }
+    }
+
+    observer.complete();
+  }
+};
+
+
+// Add a function to check if the question is related to allowed topics
+const isQuestionAllowed = (question) => {
+  const allowedTopics = [
+    'food',
+    'recipes',
+    'diets for illnesses',
+    'food companies'
+  ];
+  
+  const keywords = [
+    'food', 'recipe', 'diet', 'illness', 'company', 'brand', 'nutrition', 'calories', 'ingredients', 'cooking', 'health'
+  ];
+  
+  // Simple check: if the question contains any of the keywords
+  const questionLower = question.toLowerCase();
+  return keywords.some(keyword => questionLower.includes(keyword));
+};
+
+export const streamAdapter: Adapter = {
+  streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
+    // Check if the question is allowed
+    if (!isQuestionAllowed(prompt)) {
+      observer.error(new Error('Your question must be about food, recipes, diets for illnesses, or food companies.'));
+      return;
+    }
+
+    const body = { prompt };
+    const response = await fetch(demoProxyServerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.status !== 200) {
+      observer.error(new Error('Failed to connect to the server'));
+      return;
+    }
+
+    if (!response.body) {
+      return;
+    }
+
+    // Read a stream of server-sent events
+    // and feed them to the observer as they are being generated
+    const reader = response.body.getReader();
+    const textDecoder = new TextDecoder();
+    let doneReading = false;
+
+    while (!doneReading) {
+      const { value, done } = await reader.read();
+      if (done) {
+        doneReading = true;
+        continue;
+      }
+
+      const content = textDecoder.decode(value);
+      if (content) {
+        observer.next(content);
+      }
+    }
+
+    observer.complete();
+  }
+};
+// Add a function to check if the question is related to allowed topics
+const isQuestionAllowed = (question) => {
+  const allowedTopics = [
+    'food',
+    'recipes',
+    'diets for illnesses',
+    'food companies'
+  ];
+  
+  const keywords = [
+    'food', 'recipe', 'diet', 'illness', 'company', 'brand', 'nutrition', 'calories', 'ingredients', 'cooking', 'health'
+  ];
+  
+  // Simple check: if the question contains any of the keywords
+  const questionLower = question.toLowerCase();
+  return keywords.some(keyword => questionLower.includes(keyword));
+};
+
+export const streamAdapter: Adapter = {
+  streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
+    // Check if the question is allowed
+    if (!isQuestionAllowed(prompt)) {
+      observer.error(new Error('Your question must be about food, recipes, diets for illnesses, or food companies.'));
+      return;
+    }
+
+    const body = { prompt };
+    const response = await fetch(demoProxyServerUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(body),
+    });
+
+    if (response.status !== 200) {
+      observer.error(new Error('Failed to connect to the server'));
+      return;
+    }
+
+    if (!response.body) {
+      return;
+    }
+
+    // Read a stream of server-sent events
+    // and feed them to the observer as they are being generated
+    const reader = response.body.getReader();
+    const textDecoder = new TextDecoder();
+    let doneReading = false;
+
+    while (!doneReading) {
+      const { value, done } = await reader.read();
+      if (done) {
+        doneReading = true;
+        continue;
+      }
+
+      const content = textDecoder.decode(value);
+      if (content) {
+        observer.next(content);
+      }
+    }
+
+    observer.complete();
+  }
+};

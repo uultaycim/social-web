@@ -4,6 +4,16 @@ import { appwriteConfig, account, databases, storage, avatars } from "./config";
 import { IUpdatePost, INewPost, INewUser, IUpdateUser } from "@/types";
 // import User from "@/chat/models/user.model";
 
+export async function deleteSession() {
+  try {
+    const result = await account.deleteSessions();
+    return result;
+  } catch (error) {
+    console.error("Error deleting session:", error);
+    throw error; // Throw the error to be caught by the caller
+  }
+}
+
 // ============================== FOLLOW / UNFOLLOW USER
 export async function followUser(currentUserId: string, targetUserId: string) {
   try {
@@ -136,14 +146,13 @@ export async function createUserAccount(user: INewUser) {
     debugger;
     const newUser = await saveUserToDB({
       accountId: newAccount.$id,
-      username: newAccount.name,//name==username
+      username: newAccount.name, //name==username
       email: newAccount.email,
       imageUrl: avatarUrl,
       language: user.language,
       accountType: user.accountType,
-      followers: 0,
-      following:0
-      // rated: 0
+      followers: [],
+      following: []
     });
     console.log(newUser,"newUser")
     return newUser;
@@ -162,8 +171,8 @@ export async function saveUserToDB(user: {
   accountType:string,
   // rated:number,
   imageUrl: URL;
-  followers: number;
-  following:number
+  followers?: string[];
+  following?:string[]
 }) {
   
   try {
@@ -184,15 +193,13 @@ export async function saveUserToDB(user: {
 // ============================== SIGN IN
 export async function signInAccount(user: { email: string; password: string }) {
   try {
-    debugger;
     const session = await account.createEmailSession(user.email, user.password);
-    console.log(session, "session")
     return session;
   } catch (error) {
-    console.log(error);
+    console.error("Error signing in:", error);
+    throw error;
   }
 }
-
 // ============================== GET ACCOUNT
 export async function getAccount() {
   try {
@@ -340,22 +347,34 @@ export async function deleteFile(fileId: string) {
   }
 }
 
-// ============================== GET POSTS
 export async function searchPosts(searchTerm: string) {
   try {
-    const posts = await databases.listDocuments(
-      appwriteConfig.databaseId,
-      appwriteConfig.postCollectionId,
-      [Query.search("caption", searchTerm)]
+    const [postsByTags, postsByCaption] = await Promise.all([
+      databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.postCollectionId,
+        [Query.search("tags", searchTerm)]
+      ),
+      databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.postCollectionId,
+        [Query.search("caption", searchTerm)]
+      )
+    ]);
+
+    // Объединение результатов и удаление дубликатов
+    const allPosts = [...postsByTags.documents, ...postsByCaption.documents];
+    const uniquePosts = allPosts.filter((post, index, self) =>
+      index === self.findIndex((p) => p.$id === post.$id)
     );
 
-    if (!posts) throw Error;
-
-    return posts;
+    return { documents: uniquePosts };
   } catch (error) {
     console.log(error);
+    return { documents: [] }; // возвращаем пустой массив документов при ошибке
   }
 }
+
 
 export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
   const queries: any[] = [Query.orderDesc("$updatedAt"), Query.limit(9)];

@@ -27,6 +27,7 @@ import {
   deleteSavedPost,
   followUser,
   unfollowUser,
+  deleteSession,
 
 
 } from "@/lib/appwrite/api";
@@ -67,13 +68,28 @@ export const useCreateUserAccount = () => {
     mutationFn: (user: INewUser) => createUserAccount(user),
   });
 };
-
-export const useSignInAccount = () => {
+export const useDeleteSession = () => {
   return useMutation({
-    mutationFn: (user: { email: string; password: string }) =>
-      signInAccount(user),
+    mutationFn: () => deleteSession(),
   });
 };
+
+export const useSignInAccount = () => {
+  const deleteSessionMutation = useDeleteSession();
+
+  return useMutation({
+    mutationFn: async (user: { email: string; password: string }) => {
+      try {
+        await deleteSessionMutation.mutateAsync(); // Attempt to delete any existing session first
+      } catch (error) {
+        // Handle the error if session deletion fails
+        console.error("Error deleting session", error);
+      }
+      return signInAccount(user);
+    },
+  });
+};
+
 
 export const useSignOutAccount = () => {
   return useMutation({
