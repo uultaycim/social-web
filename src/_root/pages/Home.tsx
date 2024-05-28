@@ -5,7 +5,7 @@ import { useUserContext } from "@/context/AuthContext";
 
 const Home = () => {
   const { user } = useUserContext();
-
+  console.log(user.imageUrl, "user imageurl")
   const {
     data: posts,
     isLoading: isPostLoading,

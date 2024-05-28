@@ -9,8 +9,7 @@ export const streamAdapter: Adapter = {
   streamText: async (prompt: string, observer: StreamingAdapterObserver) => {
     const body = { prompt };
     const Related = relation(prompt)
-    console.log(prompt)
-    console.log(Related)
+
     const response = await fetch(demoProxyServerUrl, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -28,6 +27,7 @@ export const streamAdapter: Adapter = {
     const reader = response.body.getReader();
     const textDecoder = new TextDecoder();
     let doneReading = false;
+    let instructionSent = false; // Флаг для отслеживания отправки инструкции
 
     while (!doneReading) {
       const { value, done } = await reader.read();
@@ -37,12 +37,9 @@ export const streamAdapter: Adapter = {
       }
 
       const content = textDecoder.decode(value);
-      if (content) {
-      
-          observer.next(content);
-        
-      }
-      else{
+      if (content && Related) {
+        observer.next(content);
+      } else if (!instructionSent) { // Проверка на отправку инструкции
         observer.next("Вы можете задать вопрос в формате: \
         Что можно приготовить из [ваши продукты]? \
         Дай мне рецепт [желаемое блюдо] \
@@ -50,6 +47,7 @@ export const streamAdapter: Adapter = {
         Диета для [ваш_случай] \
         Составь план питания для [ваш_случай] \
         Расскажи о продукте [продукт]");
+        instructionSent = true; // Устанавливаем флаг отправки инструкции в true
       }
     }
 

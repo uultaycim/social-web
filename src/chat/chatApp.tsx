@@ -3,7 +3,7 @@ import {AiChat} from '@nlux/react';
 import '@nlux/themes/nova.css';
 import './custom-nova-theme.css';
 import {streamAdapter} from './adapter';
-import {user, botStyle} from './personas';
+import { botStyle } from './personas';
 
 export default () => {
   const adapter = useMemo(() => streamAdapter, []);
