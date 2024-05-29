@@ -91,11 +91,11 @@ const Profile = () => {
               </Link>
             ) : (
               isFollowing ? (
-                <Button type="button" className="shad-button_primary px-8" onClick={handleUnfollow}>
+                <Button type="button" className="shad-button_primary px-8 cursor-pointer" onClick={handleUnfollow}>
                   Unfollow
                 </Button>
               ) : (
-                <Button type="button" className="shad-button_primary px-8" onClick={handleFollow}>
+                <Button type="button" className="shad-button_primary px-8 cursor-pointer" onClick={handleFollow}>
                   Follow
                 </Button>
               )

@@ -33,8 +33,9 @@ const Home = () => {
 
   // Фильтруем посты, чтобы отображать только те, на создателей которых подписан пользователь
   const filteredPosts = posts?.documents.filter(post => 
-    Array.isArray(post.creator.followers) && post.creator.followers.includes(user.id)
-  );
+    post.creator && Array.isArray(post.creator.followers) && post.creator.followers.includes(user.id)
+);
+
 
   return (
     <div className="flex flex-1">

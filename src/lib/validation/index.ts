@@ -6,10 +6,13 @@ import * as z from "zod";
 export const SignupValidation = z.object({
   username: z.string().min(2, { message: "Name must be at least 2 characters." }),
   email: z.string().email(),
-  password: z.string().min(8, { message: "Password must be at least 8 characters." }),
+  password: z.string().min(8, { message: "at least 8 characters: letters, signs, symbols required." }).regex(
+    /^(?=.*[a-zA-Z])(?=.*\d)(?=.*[^a-zA-Z0-9])/
+  ),
   language: z.string(),
   accountType: z.string(),
 });
+
 
 export const SigninValidation = z.object({
   email: z.string().email(),

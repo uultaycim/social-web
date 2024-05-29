@@ -1,12 +1,16 @@
 const dictionary: { [key: string]: string } = {
   "приготовить": "cook",
+  "готовить": "cook",
   "пища": "food",
   "блюдо": "dish",
   "рецепт": "recipe",
   "диета": "diet",
   "план диеты": "diet plan",
   "план питания": "meal plan",
-  "продукт": "product"
+  "план": "plan",
+  "продукт": "product",
+  "кушать":"eat"
+
 };
 
 const translateAndMatch = (text: string): boolean => {
@@ -18,7 +22,7 @@ const translateAndMatch = (text: string): boolean => {
 
   console.log(`Testing translated text: "${translatedText}"`);
 
-  const foodRegex = /\b(cook|food|dish|recipe|diet|diet plan|meal plan|product)\b/i;
+  const foodRegex = /\b(cook|food|dish|recipe|diet|diet plan|plan|product|eat)\b/i;
   const result = foodRegex.test(translatedText);
   console.log(`Result: ${result}`);
 

@@ -32,8 +32,8 @@ const SignupForm = () => {
       username: "",
       email: "",
       password:"",
-      language: "",
-      accountType: ""
+      language: "rus",
+      accountType: "user"
     },
   });
 
@@ -91,7 +91,7 @@ const SignupForm = () => {
           Create a new account
         </h2>
         <p className="text-light-3 small-medium md:base-regular mt-2">
-          To use snapgram, Please enter your details
+          To use foody, Please enter your details
         </p>
 
         <form
@@ -139,7 +139,7 @@ const SignupForm = () => {
             )}
           />
 
-          <FormField
+          {/* <FormField
             control={form.control}
             name="accountType"
             render={({ field }) => (
@@ -172,8 +172,8 @@ const SignupForm = () => {
               <FormMessage />
             </FormItem>
             )}
-          />
-             <FormField
+          /> */}
+             {/* <FormField
             control={form.control}
             name="language"
             render={({ field }) => (
@@ -195,7 +195,7 @@ const SignupForm = () => {
                 <FormMessage />
               </FormItem>
             )}
-          />
+          /> */}
 
           
           <Button type="submit" className="shad-button_primary">

@@ -17,110 +17,85 @@ export async function deleteSession() {
 // ============================== FOLLOW / UNFOLLOW USER
 export async function followUser(currentUserId: string, targetUserId: string) {
   try {
-    // Получить текущего пользователя
-    const currentUser = await getUserById(currentUserId);
-    console.log("currentuser me following", currentUser)
-    if (!currentUser) {
-      throw new Error(`User with ID ${currentUserId} not found`);
+    // Выполняем запросы параллельно
+    const [currentUser, targetUser] = await Promise.all([
+      getUserById(currentUserId),
+      getUserById(targetUserId)
+    ]);
+
+    if (!currentUser || !targetUser) {
+      throw new Error(`One of the users not found`);
     }
 
-    // Получить целевого пользователя
-    const targetUser = await getUserById(targetUserId);
-    console.log("targetUser to follow", targetUser)
-    if (!targetUser) {
-      throw new Error(`User with ID ${targetUserId} not found`);
-    }
-
-    // Обновить подписки текущего пользователя
+    // Обновляем подписки и подписчиков
     const updatedFollowing = Array.isArray(currentUser.following) ? [...currentUser.following, targetUserId] : [targetUserId];
-    console.log('Updated following list:', updatedFollowing); // Отладочная информация
-
-    await updateUser({
-      userId: currentUser.$id,
-      username: currentUser.name,
-      bio: currentUser.bio,
-      imageId: currentUser.imageId,
-      imageUrl: currentUser.imageUrl,
-      file: currentUser.file,
-      following: updatedFollowing,
-    });
-
-    // Обновить подписчиков целевого пользователя
     const updatedFollowers = Array.isArray(targetUser.followers) ? [...targetUser.followers, currentUserId] : [currentUserId];
-    console.log('Updated followers list:', updatedFollowers); // Отладочная информация
 
-    await updateUser({
-      userId: targetUser.$id,
-      username: targetUser.name,
-      bio: targetUser.bio,
-      imageId: targetUser.imageId,
-      imageUrl: targetUser.imageUrl,
-      file: targetUser.file,
-      followers: updatedFollowers,
-    });
+    await Promise.all([
+      updateUser({
+        userId: currentUser.$id, following: updatedFollowing,
+        username: currentUser.name,
+        bio: currentUser.bio,
+        imageId: currentUser.imageId,
+        imageUrl: currentUser.imageUrl,
+        file: currentUser.file
+      }),
+      updateUser({
+        userId: targetUser.$id, followers: updatedFollowers,
+        username: targetUser.name,
+        bio: targetUser.bio,
+        imageId: targetUser.imageId,
+        imageUrl: targetUser.imageUrl,
+        file: targetUser.file
+      })
+    ]);
 
     return { status: "Ok" };
   } catch (error) {
     console.error('Error in followUser:', error);
-    return { status: "Error", message: error };
+    return { status: "Error", message: error};
   }
 }
 
-
 export async function unfollowUser(currentUserId: string, targetUserId: string) {
   try {
-    // Получаем текущего пользователя
-    const currentUser = await getUserById(currentUserId);
-    if (!currentUser) {
-      throw new Error(`User with ID ${currentUserId} not found`);
+    // Выполняем запросы параллельно
+    const [currentUser, targetUser] = await Promise.all([
+      getUserById(currentUserId),
+      getUserById(targetUserId)
+    ]);
+
+    if (!currentUser || !targetUser) {
+      throw new Error(`One of the users not found`);
     }
 
-    // Получаем целевого пользователя
-    const targetUser = await getUserById(targetUserId);
-    if (!targetUser) {
-      throw new Error(`User with ID ${targetUserId} not found`);
-    }
+    // Обновляем подписки и подписчиков
+    const updatedFollowing = currentUser.following.filter((id: string) => id !== targetUserId);
+    const updatedFollowers = targetUser.followers.filter((id: string) => id !== currentUserId);
 
-    // Проверяем существование и тип поля following у текущего пользователя
-    if (!Array.isArray(currentUser.following)) {
-      throw new Error("Invalid following data for current user");
-    }
-
-    // Проверяем существование и тип поля followers у целевого пользователя
-    if (!Array.isArray(targetUser.followers)) {
-      throw new Error("Invalid followers data for target user");
-    }
-
-    // Обновляем список подписок текущего пользователя
-    const updatedFollowing = currentUser.following.filter(id => id !== targetUserId);
-    console.log('Updated following list:', updatedFollowing); // Отладочная информация
-
-    await updateUser({
-      userId: currentUser.$id,
-      username: currentUser.name,
-      bio: currentUser.bio,
-      imageId: currentUser.imageId,
-      imageUrl: currentUser.imageUrl,
-      file: currentUser.file,
-      following: updatedFollowing,
-    });
-
-    // Обновляем список подписчиков целевого пользователя
-    const updatedFollowers = targetUser.followers.filter(id => id !== currentUserId);
-    await updateUser({
-      userId: targetUser.$id,
-      username: targetUser.name,
-      bio: targetUser.bio,
-      imageId: targetUser.imageId,
-      imageUrl: targetUser.imageUrl,
-      file: targetUser.file,
-      followers: updatedFollowers,
-    });
+    await Promise.all([
+      updateUser({
+        userId: currentUser.$id, following: updatedFollowing,
+        username: currentUser.name,
+        bio: currentUser.bio,
+        imageId: currentUser.imageId,
+        imageUrl: currentUser.imageUrl,
+        file: currentUser.file
+      }),
+      updateUser({
+        userId: targetUser.$id, followers: updatedFollowers,
+        username: targetUser.name,
+        bio: targetUser.bio,
+        imageId: targetUser.imageId,
+        imageUrl: targetUser.imageUrl,
+        file: targetUser.file
+      })
+    ]);
 
     return { status: "Ok" };
   } catch (error) {
-    console.error("Error in unfollowUser:", error);
-    throw error;
+    console.error('Error in unfollowUser:', error);
+    return { status: "Error", message: error};
   }
 }
 
