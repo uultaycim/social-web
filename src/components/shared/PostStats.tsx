@@ -1,7 +1,6 @@
 import { Models } from "appwrite";
 import { useState, useEffect } from "react";
 import { NavLink, useLocation } from "react-router-dom";
-
 import { checkIsLiked } from "@/lib/utils";
 import {
   useLikePost,
@@ -54,19 +53,20 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     likePost({ postId: post.$id, likesArray });
   };
 
-  const handleSavePost = (
+
+  const handleSavePost = async (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>
   ) => {
     e.stopPropagation();
-
+    setIsSaved(!isSaved);
+  
     if (savedPostRecord) {
-      setIsSaved(false);
-      return deleteSavePost(savedPostRecord.$id);
+      await deleteSavePost(savedPostRecord.$id);
+    } else {
+      await savePost({ userId: userId, postId: post.$id });
     }
-
-    savePost({ userId: userId, postId: post.$id });
-    setIsSaved(true);
   };
+  
 
   const containerStyles = location.pathname.startsWith("/profile")
     ? "w-full"

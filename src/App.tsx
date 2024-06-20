@@ -34,7 +34,6 @@ const App = () => {
         {/* private routes */}
         <Route element={<RootLayout />}>
           <Route index element={<Home />} />
-          {/* <Route path="/chat" element={<chatApp/>} /> */}
           <Route path="/chat" element={<ChatApp/>} />
           <Route path="/explore" element={<Explore />} />
           <Route path="/saved" element={<Saved />} />

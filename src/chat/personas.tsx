@@ -6,8 +6,8 @@ export const botStyle = {
     justifyContent: 'center',
   };
   
-  export const user = {
-    name: 'Alex',
-    picture: 'https://nlux.ai/images/demos/persona-user.jpeg'
-  };
+  // export const user = {
+  //   name: 'Alex',
+  //   picture: 'https://nlux.ai/images/demos/persona-user.jpeg'
+  // };
   

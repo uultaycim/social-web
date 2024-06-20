@@ -33,6 +33,7 @@ export type IUpdateUser = {
 };
 
 export type IUser = {
+  $id: any;
   name: any;
   id: string;
   username: string;

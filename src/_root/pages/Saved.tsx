@@ -12,7 +12,7 @@ const Saved = () => {
       creator: {
         imageUrl: currentUser.imageUrl,
       },
-    }))
+    })) 
     .reverse();
 
   return (

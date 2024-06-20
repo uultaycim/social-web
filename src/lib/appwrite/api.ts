@@ -324,21 +324,39 @@ export async function deleteFile(fileId: string) {
 
 export async function searchPosts(searchTerm: string) {
   try {
-    const [postsByTags, postsByCaption] = await Promise.all([
+    // Разделение searchTerm по запятым и удаление лишних пробелов
+    const searchTerms = searchTerm.split(',').map(term => term.trim()).filter(term => term);
+
+    // Создание массивов для хранения промисов поиска по тегам и описаниям
+    const tagSearchPromises = searchTerms.map(term => 
       databases.listDocuments(
         appwriteConfig.databaseId,
         appwriteConfig.postCollectionId,
-        [Query.search("tags", searchTerm)]
-      ),
-      databases.listDocuments(
-        appwriteConfig.databaseId,
-        appwriteConfig.postCollectionId,
-        [Query.search("caption", searchTerm)]
+        [Query.search("tags", term)]
       )
+    );
+
+    const captionSearchPromises = searchTerms.map(term => 
+      databases.listDocuments(
+        appwriteConfig.databaseId,
+        appwriteConfig.postCollectionId,
+        [Query.search("caption", term)]
+      )
+    );
+
+    // Выполнение всех промисов параллельно
+    const [postsByTagsResults, postsByCaptionResults] = await Promise.all([
+      Promise.all(tagSearchPromises),
+      Promise.all(captionSearchPromises)
     ]);
 
-    // Объединение результатов и удаление дубликатов
-    const allPosts = [...postsByTags.documents, ...postsByCaption.documents];
+    // Объединение всех результатов поиска по тегам и описаниям
+    const allPosts = [
+      ...postsByTagsResults.flatMap(result => result.documents),
+      ...postsByCaptionResults.flatMap(result => result.documents)
+    ];
+
+    // Удаление дубликатов
     const uniquePosts = allPosts.filter((post, index, self) =>
       index === self.findIndex((p) => p.$id === post.$id)
     );
@@ -349,7 +367,6 @@ export async function searchPosts(searchTerm: string) {
     return { documents: [] }; // возвращаем пустой массив документов при ошибке
   }
 }
-
 
 export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
   const queries: any[] = [Query.orderDesc("$updatedAt"), Query.limit(9)];
@@ -497,10 +514,25 @@ export async function likePost(postId: string, likesArray: string[]) {
 }
 
 // ============================== SAVE POST
+let isSaving = false;
+
 export async function savePost(userId: string, postId: string) {
+  if (isSaving) return;
+
+  isSaving = true;
   try {
-    debugger;
-    console.log(userId)
+    const savedPosts = await databases.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.savesCollectionId,
+      [Query.equal('users', userId), Query.equal('post', postId)]
+    );
+
+    if (savedPosts.total > 0) {
+      // Пост уже сохранен
+      console.log("Post is already saved");
+      return null;
+    }
+
     const updatedPost = await databases.createDocument(
       appwriteConfig.databaseId,
       appwriteConfig.savesCollectionId,
@@ -511,13 +543,16 @@ export async function savePost(userId: string, postId: string) {
       }
     );
 
-    if (!updatedPost) throw Error;
+    if (!updatedPost) throw new Error("Failed to save post");
 
     return updatedPost;
   } catch (error) {
-    console.log(error);
+    console.error(error);
+  } finally {
+    isSaving = false;
   }
 }
+
 // ============================== DELETE SAVED POST
 export async function deleteSavedPost(savedRecordId: string) {
   try {
@@ -628,17 +663,18 @@ export async function updateUser(user: IUpdateUser) {
     if (hasFileToUpdate) {
       // Upload new file to appwrite storage
       const uploadedFile = await uploadFile(user.file[0]);
-      if (!uploadedFile) throw Error;
-
-      // Get new file url
-      const fileUrl = getFilePreview(uploadedFile.$id);
+      if (uploadedFile) {
+       const fileUrl = getFilePreview(uploadedFile.$id);
       if (!fileUrl) {
         await deleteFile(uploadedFile.$id);
         throw Error;
       }
 
       image = { ...image, imageUrl: fileUrl, imageId: uploadedFile.$id };
-      console.log("image", image)
+      console.log("image", image)};
+
+      // Get new file url
+     
     }
 
     //  Update user
