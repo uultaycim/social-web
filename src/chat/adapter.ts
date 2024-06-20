@@ -28,7 +28,8 @@ export const streamAdapter: Adapter = {
     const textDecoder = new TextDecoder();
     let doneReading = false;
     let instructionSent = false; // Флаг для отслеживания отправки инструкции
-
+     
+    observer.next("Ответы ИИ бывают не точными. Используйте рекомендации с осторожностью!\n\n");
     while (!doneReading) {
       const { value, done } = await reader.read();
       if (done) {

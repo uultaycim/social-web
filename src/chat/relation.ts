@@ -9,6 +9,7 @@ const dictionary: { [key: string]: string } = {
   "план питания": "meal plan",
   "план": "plan",
   "продукт": "product",
+  "продукте": "product",
   "кушать":"eat"
 
 };
